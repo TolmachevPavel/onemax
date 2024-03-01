@@ -5,7 +5,7 @@
  
 int main(int argc, char** argv) {
 
-/* Демонстрация srand */
+/* Демонстрация srand, генерация двоичных чисел */
 
   int srand_param = 1;
   
@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
   }
 
   srand(srand_param);
-  printf("%d\n", rand());
-  printf("%d\n", rand());
-  printf("%d\n", rand());
-  printf("%d\n", rand());
-  printf("%d\n", rand());
-
-  printf("%d\n", srand_param);
+  printf("%d\n", (rand() % (1 - 0 + 1)) + 0);
+  printf("%d\n", (rand() % (1 - 0 + 1)) + 0);
+  printf("%d\n", (rand() % (1 - 0 + 1)) + 0);
+  printf("%d\n", (rand() % (1 - 0 + 1)) + 0);
+  printf("%d\n", (rand() % (1 - 0 + 1)) + 0);
+  
+  printf("srand_param = %d\n", srand_param);
 }
