@@ -23,8 +23,7 @@ int main(int argc, char** argv) {
 // Заполняем массив значениями
 
 for (pi = 0; pi < p_size; pi++) {
-
-    for(i=1; i < max_length; i++) {
+    for(i=0; i < max_length; i++) {
         population[pi][i] = (rand() % (1 - 0 + 1)) + 0;
     }
 }
