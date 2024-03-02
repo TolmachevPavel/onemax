@@ -28,6 +28,7 @@ for (pi = 0; pi < p_size; pi++) {
     }
 }
 
+/* Вывод хромосом на экран */
 for (pi = 0; pi < p_size; pi++) {
     for(i = 0; i < max_length; ++i) {
         printf("%d", population[pi][i]);}
