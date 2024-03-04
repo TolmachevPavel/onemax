@@ -10,10 +10,13 @@ int main(int argc, char** argv) {
     int max = 10;
     int n_from, n_max;
     int max_length = 10;
-    int p_size = 2;
+    int p_size = 10;
     int i = 0;
     int pi = 0;
     int s_left;
+    int p_tournament = 3;
+    int pop_after_tour[p_tournament];
+    int p_rand;
 
     /* Структура для хранения одного экземпляра */
     struct Pop
@@ -55,46 +58,18 @@ int main(int argc, char** argv) {
     }
     printf("\n");
     
-    /* Генерация случайного числа в промежутке ОТ и ДО */
-    /* Случайным образом выбираю точку скрещивания, слева от которой гены останутся нетронутыми, справа - поменяются с другой парой */
-    /* Пример: */
-    /* 0110<точка_скрещивания>1001 -> 0110.1101 */
-    /* 1110<точка_скрещивания>1101 -> 1110.1001 */
-    s_left = n_from + rand()%(n_max - n_from + 1);
-    printf("left: %d\n", s_left);
-    printf("right: %d", max_length - s_left);
-    printf("\n");
-
-    /* Одноточечное случайное скрещивание */
-
-    /* Сначала дублируем всё что слева от точки скрещивания */
-    //printf("(s_left-1): %d\n",s_left-1);
-    for (pi = 0; pi < 2; pi++) {
-        for(i=0; i < s_left; i++) {
-            new_individ[pi].gene[i] = pop[pi].gene[i];
-            //printf("%d. Первая часть: <%d> ", pi, pop[pi].gene[i]);
-        }
-    //printf("\n");
-    }
-    /* Обрабатываем вторые куски - то, что справа меняем местами между парами */
-    for(i=s_left; i < max_length; i++) {
-        new_individ[0].gene[i] = pop[1].gene[i];
-        //printf("1. Вторая часть: <%d> ", pop[1].gene[i]);
-    }
-    //printf("\n");
-    for(i=s_left; i < max_length; i++) {
-        new_individ[1].gene[i] = pop[0].gene[i];
-        //printf("2. Вторая часть: <%d> ", pop[0].gene[i]);
-    }
-    printf("\n");
-
-    /* Выводим обновлённой пары индивидов */
+    /* Отбор */
     for (pi = 0; pi < p_size; pi++) {
-        printf("gene: ");
-        for(i = 0; i < max_length; ++i) {
-            printf("%d", new_individ[pi].gene[i]);}
-        //printf("; cost: %d", new_individ[pi].cost);
-        printf("\n");
+        for (i = 0; i < p_tournament; i++) { // цикл из n раз
+            // Генерация случайного числа от 1 до 10
+            p_rand = 1 + rand()%(p_size - 1 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
+            pop_after_tour[i] = pop[pi].gene;
+            printf("%d\n", pop_after_tour[i]);
+        // оценить полученные индивиды
+        // выбрать лучшего индивида -> записать его в новый пул
+        
+        // На выходе - p_size элементов в обновлённом пуле
+        }
     }
 
 }
