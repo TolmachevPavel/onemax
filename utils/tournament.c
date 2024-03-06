@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 
     /* Выводим всех сгенерированных индивидов на экран */
     for (pi = 0; pi < p_size; pi++) {
-        printf("№ %d gene: ", pi+1);
+        printf("№ %d gene: ", pi);
         for(i = 0; i < max_length; ++i) {
             printf("%d", pop[pi].gene[i]);}
         printf("; cost: %d", pop[pi].cost);
@@ -62,30 +62,32 @@ int main(int argc, char** argv) {
     /* Отбор */
     /* В цикле размером макс.кол-во в поколении генерирую три случайных числа от 1 до макс.кол-во в поколении */
     for (pi = 0; pi < p_size; pi++) {
-        printf("%d-й индивид:\n", pi+1);
+        printf("%d-й индивид:\n", pi);
         int last_id, last_cost = -1;
         for (i = 0; i < p_tournament; i++) { // цикл из n раз
             // Генерация случайного числа от 1 до 10
-            p_rand = 1 + rand()%(p_size - 1 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
-            printf("p_rand: %d, cost: %d\n", p_rand, pop[p_rand-1].cost);
+            // s_left = n_from + rand()%(n_max - n_from + 1);
+            p_rand = 0 + rand()%((p_size-1) - 0 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
+            printf("p_rand: %d, cost: %d\n", p_rand, pop[p_rand].cost);
             // Выбираем лучшего из троих
-            if (pop[p_rand-1].cost > last_cost) {
-                last_id = p_rand-1;
-                last_cost = pop[p_rand-1].cost;
+            if (pop[p_rand].cost > last_cost) {
+                //printf("last_id_old: %d; curr_id: %d",last_cost, pop[p_rand].cost);
+                last_id = p_rand;
+                last_cost = pop[p_rand].cost;
             }
         }
         for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
-            new_pop[pi].gene[i] = pop[p_rand-1].gene[i];
-            printf("%d",pop[p_rand-1].gene[i]);
+            new_pop[pi].gene[i] = pop[last_id].gene[i];
+            printf("%d",pop[last_id].gene[i]);
         } 
-    printf("\nThe Best %d, cost: %d\n", last_id+1, last_cost);
+    printf("\nThe Best %d, cost: %d\n", last_id, last_cost);
     new_pop[pi].cost = last_cost;
     }
 
     printf("\nПоколение после турнирного отбора:\n");
     /* Выводим новых индивидов на экран */
     for (pi = 0; pi < p_size; pi++) {
-        printf("№ %d gene: ", pi+1);
+        printf("№ %d gene: ", pi);
         for(i = 0; i < max_length; ++i) {
             printf("%d", new_pop[pi].gene[i]);}
         printf("; cost: %d", new_pop[pi].cost);
