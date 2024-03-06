@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
 
     struct Pop pop[p_size];         /* Сгенерированный набор экземпляров размером из конфига */
     struct Pop new_individ[2];      /* Два экземпляра для скрещивания */
+    struct Pop new_pop[p_size];
 
     n_from = 2; /* минимальная граница слева для селекции */
     n_max = max_length-1; /* максимальная граница справа для селекции */
@@ -50,7 +51,7 @@ int main(int argc, char** argv) {
 
     /* Выводим всех сгенерированных индивидов на экран */
     for (pi = 0; pi < p_size; pi++) {
-        printf("gene: ");
+        printf("№ %d gene: ", pi+1);
         for(i = 0; i < max_length; ++i) {
             printf("%d", pop[pi].gene[i]);}
         printf("; cost: %d", pop[pi].cost);
@@ -59,17 +60,34 @@ int main(int argc, char** argv) {
     printf("\n");
     
     /* Отбор */
+    /* В цикле размером макс.кол-во в поколении генерирую три случайных числа от 1 до макс.кол-во в поколении */
     for (pi = 0; pi < p_size; pi++) {
+        printf("%d-й индивид:\n", pi+1);
+        int last_id, last_cost = -1;
         for (i = 0; i < p_tournament; i++) { // цикл из n раз
             // Генерация случайного числа от 1 до 10
             p_rand = 1 + rand()%(p_size - 1 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
-            pop_after_tour[i] = pop[pi].gene;
-            printf("%d\n", pop_after_tour[i]);
-        // оценить полученные индивиды
-        // выбрать лучшего индивида -> записать его в новый пул
-        
-        // На выходе - p_size элементов в обновлённом пуле
+            printf("№ %d, cost: %d\n", p_rand, pop[p_rand-1].cost);
+            // Выбираем лучшего из троих
+            if (pop[p_rand-1].cost > last_cost) {
+                last_id = p_rand-1;
+                last_cost = pop[p_rand-1].cost;
+            }
+            
         }
+    printf("The Best %d, cost: %d\n", last_id+1, last_cost);
+    new_pop[pi].cost = last_cost;
     }
+
+    printf("Поколение после турнирного отбора:\n");
+    /* Выводим новых индивидов на экран */
+    for (pi = 0; pi < p_size; pi++) {
+        printf("№ %d gene: ", pi+1);
+        for(i = 0; i < max_length; ++i) {
+            printf("%d", new_pop[pi].gene[i]);}
+        printf("; cost: %d", new_pop[pi].cost);
+        printf("\n");
+    }
+    printf("\n");
 
 }
