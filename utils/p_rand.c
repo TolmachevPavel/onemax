@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     p_rand = 1 + rand()%(10 - 1 + 1);
 
     // Если сработала вероятность 0.1 - тогда вывести сообщение
-    if (p_rand == 10) {
+    if (p_rand != 10) {
         printf("Сработало!!!\n");
     }
     //printf("%d\n", srand_param);
