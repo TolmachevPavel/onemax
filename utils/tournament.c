@@ -67,19 +67,22 @@ int main(int argc, char** argv) {
         for (i = 0; i < p_tournament; i++) { // цикл из n раз
             // Генерация случайного числа от 1 до 10
             p_rand = 1 + rand()%(p_size - 1 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
-            printf("№ %d, cost: %d\n", p_rand, pop[p_rand-1].cost);
+            printf("p_rand: %d, cost: %d\n", p_rand, pop[p_rand-1].cost);
             // Выбираем лучшего из троих
             if (pop[p_rand-1].cost > last_cost) {
                 last_id = p_rand-1;
                 last_cost = pop[p_rand-1].cost;
             }
-            
         }
-    printf("The Best %d, cost: %d\n", last_id+1, last_cost);
+        for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
+            new_pop[pi].gene[i] = pop[p_rand-1].gene[i];
+            printf("%d",pop[p_rand-1].gene[i]);
+        } 
+    printf("\nThe Best %d, cost: %d\n", last_id+1, last_cost);
     new_pop[pi].cost = last_cost;
     }
 
-    printf("Поколение после турнирного отбора:\n");
+    printf("\nПоколение после турнирного отбора:\n");
     /* Выводим новых индивидов на экран */
     for (pi = 0; pi < p_size; pi++) {
         printf("№ %d gene: ", pi+1);
