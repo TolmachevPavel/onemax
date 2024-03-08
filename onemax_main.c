@@ -9,11 +9,11 @@
 int main(int argc, char** argv) {
 /* Отбор, но чуть попозже */
 
-    int MAX_GENERATIONS = 50;   // Максимальное количество поколений
+    int MAX_GENERATIONS = 70;   // Максимальное количество поколений
 
     //int max = 10;
     int n_from, n_max;  /* Левая и правая границы селекции */
-    int max_length = 100;    /* Размер хромосомы */
+    int max_length = 11;    /* Размер хромосомы */
     int p_size = 10;    /* Размер популяции */
     int i = 0;
     int pi = 0;
@@ -250,12 +250,15 @@ int main(int argc, char** argv) {
     printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
 
     /* Копирование текущей популяции в структуру первой популяции и повторение цикла */
-
+    printf("\n");
     int r_ind = 0;
     for (pi = 0; pi < p_size; pi++) {   /* Счётчик индивидов */
         for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
             pop[pi].gene[i] = the2pop[pi].gene[i];
+            printf("%d", pop[pi].gene[i]);
         }
+    printf("\n");        
+
     }
     printf("\n");
     // // Вывод на экран
