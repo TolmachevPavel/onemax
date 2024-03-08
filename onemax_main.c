@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
     //int max = 10;
     int n_from, n_max;  /* Левая и правая границы селекции */
-    int max_length = 10;    /* Размер хромосомы */
+    int max_length = 100;    /* Размер хромосомы */
     int p_size = 10;    /* Размер популяции */
     int i = 0;
     int pi = 0;
@@ -238,6 +238,7 @@ int main(int argc, char** argv) {
         /* Получение максимальной стоимости */
             if (the2pop[pi].cost > math_max_val){
                 math_max_val = the2pop[pi].cost;
+                itog[cnt_generations].max = math_max_val;
             }
     }
     /* Статистика: Среднее и Максимальное в поколении */
@@ -245,8 +246,8 @@ int main(int argc, char** argv) {
     printf("max_cost: %d\n", math_max_val);
     itog[cnt_generations].generations = cnt_generations;
     itog[cnt_generations].avg = (float)math_all_gene/p_size;
-    itog[cnt_generations].max = math_max_val;    
-    printf("generations: %d, sum_genes: %.1f, max_cost: \n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
+    itog[cnt_generations].max = math_max_val;
+    printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
 
     /* Копирование текущей популяции в структуру первой популяции и повторение цикла */
 
@@ -268,6 +269,6 @@ int main(int argc, char** argv) {
     }
 
     for (i=0; i < MAX_GENERATIONS; i++) {
-       printf("generations: %d, sum_genes: %.1f, max_cost: \n", i+1, itog[i].avg, itog[i].max);
+       printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", i+1, itog[i].avg, itog[i].max);
     }
 }
