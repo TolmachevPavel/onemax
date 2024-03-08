@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 
     int MAX_GENERATIONS = 50;   // Максимальное количество поколений
 
-    int max = 10;
+    //int max = 10;
     int n_from, n_max;  /* Левая и правая границы селекции */
     int max_length = 10;    /* Размер хромосомы */
     int p_size = 10;    /* Размер популяции */
@@ -26,6 +26,8 @@ int main(int argc, char** argv) {
     int p_mut = 0;  /* Случайное число для сравнения с вероятностью мутации */
     int math_all_gene = 0;
     int math_max_val = 0;
+    int cnt_generations = 0;
+    int vals_mean_max[MAX_GENERATIONS][MAX_GENERATIONS][MAX_GENERATIONS]; /* Хранение среднего и максимального значения */
     
     n_from = 1; /* минимальная граница слева для селекции */
     n_max = max_length-2; /* максимальная граница справа для селекции */
@@ -37,10 +39,19 @@ int main(int argc, char** argv) {
         int cost;               /* Стоимость данного экземпляра (сумма значений генов) */
     } Pop;
 
+    /* Структура для хранения итоговых значений */
+    struct Itog
+    {
+        int generations;    /* Номер поколения */
+        float avg;   /* Среднее */
+        int max;    /* Максимальное */
+    } Itog;
+
     struct Pop pop[p_size];         /* Сгенерированный набор экземпляров размером из конфига */
     struct Pop new_individ[2];      /* Два экземпляра для скрещивания */
     struct Pop new_pop[p_size];
     struct Pop the2pop[p_size];
+    struct Itog itog[MAX_GENERATIONS];
 
     n_from = 2; /* минимальная граница слева для селекции */
     n_max = max_length-1; /* максимальная граница справа для селекции */
@@ -73,6 +84,8 @@ int main(int argc, char** argv) {
     }
     printf("\n");
     
+    for (cnt_generations = 0; cnt_generations < MAX_GENERATIONS; cnt_generations++) {
+
     /* ========== ТУРНИРНЫЙ ОТБОР ========== */
 
     /* В цикле размером макс.кол-во в поколении генерирую три случайных числа от 1 до макс.кол-во в поколении */
@@ -230,4 +243,31 @@ int main(int argc, char** argv) {
     /* Статистика: Среднее и Максимальное в поколении */
     printf("\nsum_genes: %.1f\n", (float)math_all_gene/p_size);
     printf("max_cost: %d\n", math_max_val);
+    itog[cnt_generations].generations = cnt_generations;
+    itog[cnt_generations].avg = (float)math_all_gene/p_size;
+    itog[cnt_generations].max = math_max_val;    
+    printf("generations: %d, sum_genes: %.1f, max_cost: \n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
+
+    /* Копирование текущей популяции в структуру первой популяции и повторение цикла */
+
+    int r_ind = 0;
+    for (pi = 0; pi < p_size; pi++) {   /* Счётчик индивидов */
+        for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
+            pop[pi].gene[i] = the2pop[pi].gene[i];
+        }
+    }
+    printf("\n");
+    // // Вывод на экран
+    // for (pi = 0; pi < p_size; pi++) {
+    //     printf("gene: ");
+    //     for(i = 0; i < max_length; ++i) {
+    //         printf("%d", pop[pi].gene[i]);}
+    //     //printf("; cost: %d", pop[pi].cost);
+    //     printf("\n");
+    // }
+    }
+
+    for (i=0; i < MAX_GENERATIONS; i++) {
+       printf("generations: %d, sum_genes: %.1f, max_cost: \n", i+1, itog[i].avg, itog[i].max);
+    }
 }
