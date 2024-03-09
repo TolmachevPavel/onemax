@@ -10,7 +10,7 @@ int main()
     pid_t pid=fork();
     if (pid==0) { /* child process */
         //static char *argv[]={"gnuplot","Foo is my name.",NULL};
-        static char *argv[]={"gnuplot",NULL};
+        static char *argv[]={"gnuplot","gn_graph.gpi",NULL};
         execv("/bin/gnuplot",argv);
         exit(127); /* only if execv fails */
     }
