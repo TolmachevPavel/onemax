@@ -14,10 +14,10 @@ int main(int argc, char** argv) {
 /* Отбор, но чуть попозже */
 
     int MAX_GENERATIONS = 100;   // Количество поколений
-    int P_MUTATION = 35;
+    int P_MUTATION = 10;    /* Вероятность мутации */
     int max_length = 100;    /* Размер хромосомы */
     int p_size = 100;    /* Размер популяции */
-    int p_tournament = 48;  /* Индивидов в турнирном отборе */
+    int p_tournament = 6;  /* Индивидов в турнирном отборе */
     int P_CROSSOVER = 90;   /* Вероятность скрещивания */
 
     int n_from, n_max;  /* Левая и правая границы селекции */
@@ -405,6 +405,7 @@ int main(int argc, char** argv) {
         //printf("cnt_generations: %d; currMax: %d\n",cnt_generations,currMax);
     } while (cnt_generations < MAX_GENERATIONS && currMax < max_length);
 
+    // Запись итоговых данных в файл
     file = fopen("GA_data", "w");
     printf("\n");
     i = 1;
@@ -420,12 +421,12 @@ int main(int argc, char** argv) {
         }
     }
     fclose(file);
+    // Окончание записи данных в файл
 
-    //if (debug_mode == 1) {
-        printf("\ndebug_mode = %d\n", debug_mode);
-        printf("srand_param = %d\n", srand_param);
-    //}
+    printf("\ndebug_mode = %d\n", debug_mode);
+    printf("srand_param = %d\n", srand_param);
 
+    // Запуск команды gnuplot для рисования графика
     pid_t pid=fork();
     if (pid==0) {
         static char *argv[]={"gnuplot","ga_graph.gpi",NULL};
