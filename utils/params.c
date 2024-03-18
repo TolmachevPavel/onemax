@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
  #include <string.h>
  int main(int argc, char **argv) {
      if(argc <= 1) {
@@ -21,5 +21,6 @@
      } else {
          printf("Unknown parameter: '%s'. Type %s --help for help.\n", argv[1], argv[0]);
      }
-     return 0;
+     printf("\nHello\n");
+     //return 0;
  }

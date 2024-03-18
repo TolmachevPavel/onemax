@@ -1,0 +1,15 @@
+#! /usr/bin/gnuplot -persist
+
+set ylabel 'Max and Mean in generations'	# Заголовок левой вертикальной оси
+set key top left	# Инфоблок разместить слева сверху
+set term jpeg	# На выходе будет jpeg
+set title "OneMax"	# Заголовок графика
+set terminal jpeg size 1400, 1000	# Размер итоговой картинки
+set output "GA_onemax.jpeg"	# Название итоговой картинки
+set grid	# Отобразить сетку
+
+set style fill transparent solid 0.35 border	# Указываю прозрачность и что нужно нарисовать границу на графиках
+set style line 1 lt 1 lw 2 pt 1 ps 1 lc rgb "red"	# Стиль для первого графика
+set style line 2 lt 1 lw 1 pt 1 ps 1 lc rgb "navy"	# Стиль для второго графика
+
+plot "GA_data" using 1:2 with lines title "Mean" ls 2, "GA_data" using 1:3 with lines title "Max" ls 1
