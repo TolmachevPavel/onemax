@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
 /* Отбор, но чуть попозже */
 
     int MAX_GENERATIONS = 100;   // Количество поколений
-    int P_MUTATION = 10;    /* Вероятность мутации */
-    int max_length = 100;    /* Размер хромосомы */
     int p_size = 100;    /* Размер популяции */
+    int max_length = 100;    /* Размер хромосомы */
     int p_tournament = 6;  /* Индивидов в турнирном отборе */
     int P_CROSSOVER = 90;   /* Вероятность скрещивания */
+    int P_MUTATION = 10;    /* Вероятность мутации */
 
     int n_from, n_max;  /* Левая и правая границы селекции */
     int i = 0;
@@ -36,6 +36,11 @@ int main(int argc, char** argv) {
     int currMax = 0;
     FILE *file;
     
+    // Генерация случайного числа начиная от min до max (включительно края)
+    int generate_random_number(int min, int max) {
+        return min + rand()%(max - min + 1);
+    }
+
     /* Структура для хранения одного экземпляра */
     struct Pop
     {
@@ -79,14 +84,17 @@ int main(int argc, char** argv) {
     // Устанавливаем генератор случайных чисел
     srand(srand_param); /* При одном и том же srand_param - будут выдавать одни и те же псевдослучайные значения */
 
-    printf("Количество поколений: %d\nРазмер популяции: %d\nРазмер хромосомы: %d\nИндивидов в турнирном отборе: %d\nВероятность скрещивания: %d\nВероятность мутации: %d\n\n",MAX_GENERATIONS,p_size,max_length,p_tournament,P_CROSSOVER,P_MUTATION);
+    printf("Количество поколений: %d\nРазмер популяции: %d\nРазмер хромосомы: %d\nИндивидов в турнирном отборе: %d\nВероятность скрещивания: %d\nВероятность мутации: %d\n",MAX_GENERATIONS,p_size,max_length,p_tournament,P_CROSSOVER,P_MUTATION);
+    printf("\ndebug_mode = %d\n", debug_mode);
+    printf("srand_param = %d\n", srand_param);
 
     /* ========== ГЕНЕРАЦИЯ ПЕРВОГО ПОКОЛЕНИЯ ========== */
 
     for (pi = 0; pi < p_size; pi++) {   /* Счётчик индивидов */
         pop[pi].cost = 0;
         for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
-            pop[pi].gene[i] = (rand() % (1 - 0 + 1)) + 0;   /* Генерирую случайное 1 или 0 */
+            //pop[pi].gene[i] = (rand() % (1 - 0 + 1)) + 0;   /* Генерирую случайное 1 или 0 */
+            pop[pi].gene[i] = generate_random_number(0,1);   /* Генерирую случайное 1 или 0 */
             pop[pi].cost = pop[pi].cost + pop[pi].gene[i];  /* Суммирую стоимость */
         }
     }
@@ -137,7 +145,8 @@ int main(int argc, char** argv) {
                 printf("\n%d-й шаг турнирного отбора:\n", i);
             }
             // Генерация случайного числа от 0 до p_size - чтобы случайно выбрать одного из индивидов текущего поколения
-            p_rand = 0 + rand()%((p_size-1) - 0 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
+            //p_rand = 0 + rand()%((p_size-1) - 0 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
+            p_rand = generate_random_number(0,(p_size-1));    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
             if (debug_mode == 1) {
                 printf("p_rand: %d, cost: %d\n", p_rand, pop[p_rand].cost);
             }
@@ -194,7 +203,8 @@ int main(int argc, char** argv) {
             printf("Пара номер: pi: %d\n", pi);
         }
         // Генерация случайного числа от 1 до 10
-        p_rand = 1 + rand()%(100 - 1 + 1);
+        //p_rand = 1 + rand()%(100 - 1 + 1);
+        p_rand = generate_random_number(1, 100);    // Генерация случайного числа от 1 до 100
         // Если сработала вероятность 0.9 - произвести скрещивание
         if (debug_mode == 1) {
             printf("p_rand: %d ", p_rand);
@@ -205,7 +215,8 @@ int main(int argc, char** argv) {
         /* Пример: */
         /* 0110<точка_скрещивания>1001 -> 0110.1101 */
         /* 1110<точка_скрещивания>1101 -> 1110.1001 */
-        s_left = n_from + rand()%(n_max - n_from);
+        //s_left = n_from + rand()%(n_max - n_from);
+        s_left = generate_random_number(n_from, n_max-1);
         if (debug_mode == 1) {
             printf("left: %d\n", s_left);
             printf("right: %d", max_length - s_left - 1);
@@ -311,7 +322,8 @@ int main(int argc, char** argv) {
 
     for (pi = 0; pi < p_size; pi++) {
         // Генерация случайного числа от 1 до 100 %
-        p_rand = 1 + rand()%(100 - 1 + 1);
+        //p_rand = 1 + rand()%(100 - 1 + 1);
+        p_rand = generate_random_number(1,100);
         if (debug_mode == 1) {
             printf("%d: Вероятность мутации: %d\n", pi, p_rand);
         }
@@ -319,7 +331,8 @@ int main(int argc, char** argv) {
         
         if (p_rand <= P_MUTATION) {
             // Генерация случайного числа от 0 до max_length-1
-            p_mut = 0 + rand()%(max_length - 0);
+            //p_mut = 0 + rand()%(max_length - 0);
+            p_mut = generate_random_number(0, max_length-1);
             if (debug_mode == 1) {
                 printf("Ген: %d\n", p_mut);
             }
@@ -422,9 +435,6 @@ int main(int argc, char** argv) {
     }
     fclose(file);
     // Окончание записи данных в файл
-
-    printf("\ndebug_mode = %d\n", debug_mode);
-    printf("srand_param = %d\n", srand_param);
 
     // Запуск команды gnuplot для рисования графика
     pid_t pid=fork();
