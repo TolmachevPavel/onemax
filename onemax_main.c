@@ -8,17 +8,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+    // Генерация случайного числа начиная от min до max (включительно края)
+    int generate_random_number(int min, int max) {
+        return min + rand()%(max - min + 1);
+    }
+
 /* ===== OneMax ===== */
 
 int main(int argc, char** argv) {
 /* Отбор, но чуть попозже */
 
-    int MAX_GENERATIONS = 100;   // Количество поколений
-    int p_size = 100;    /* Размер популяции */
-    int max_length = 100;    /* Размер хромосомы */
-    int p_tournament = 6;  /* Индивидов в турнирном отборе */
+    int MAX_GENERATIONS = 4;   // Количество поколений
+    int p_size = 10;    /* Размер популяции */
+    int max_length = 5;    /* Размер хромосомы */
+    int p_tournament = 3;  /* Индивидов в турнирном отборе */
     int P_CROSSOVER = 90;   /* Вероятность скрещивания */
-    int P_MUTATION = 10;    /* Вероятность мутации */
+    int P_MUTATION = 0;    /* Вероятность мутации */
 
     int n_from, n_max;  /* Левая и правая границы селекции */
     int i = 0;
@@ -35,12 +40,8 @@ int main(int argc, char** argv) {
     int vals_mean_max[MAX_GENERATIONS][MAX_GENERATIONS][MAX_GENERATIONS]; /* Хранение среднего и максимального значения */
     int currMax = 0;
     FILE *file;
+    FILE *log_file;
     
-    // Генерация случайного числа начиная от min до max (включительно края)
-    int generate_random_number(int min, int max) {
-        return min + rand()%(max - min + 1);
-    }
-
     /* Структура для хранения одного экземпляра */
     struct Pop
     {
@@ -84,9 +85,16 @@ int main(int argc, char** argv) {
     // Устанавливаем генератор случайных чисел
     srand(srand_param); /* При одном и том же srand_param - будут выдавать одни и те же псевдослучайные значения */
 
+    log_file = fopen("GA_logfile", "w");    // файл для журналирования при включенном debug-режиме
+
     printf("Количество поколений: %d\nРазмер популяции: %d\nРазмер хромосомы: %d\nИндивидов в турнирном отборе: %d\nВероятность скрещивания: %d\nВероятность мутации: %d\n",MAX_GENERATIONS,p_size,max_length,p_tournament,P_CROSSOVER,P_MUTATION);
     printf("\ndebug_mode = %d\n", debug_mode);
     printf("srand_param = %d\n", srand_param);
+
+    fprintf(log_file,"Количество поколений: %d\nРазмер популяции: %d\nРазмер хромосомы: %d\nИндивидов в турнирном отборе: %d\nВероятность скрещивания: %d\nВероятность мутации: %d\n",MAX_GENERATIONS,p_size,max_length,p_tournament,P_CROSSOVER,P_MUTATION);
+    fprintf(log_file,"\ndebug_mode = %d\n", debug_mode);
+    fprintf(log_file,"srand_param = %d\n", srand_param);
+    fprintf(log_file,"\n");
 
     /* ========== ГЕНЕРАЦИЯ ПЕРВОГО ПОКОЛЕНИЯ ========== */
 
@@ -102,24 +110,30 @@ int main(int argc, char** argv) {
     /* Выводим всех сгенерированных индивидов на экран */
     if (debug_mode == 1) {
         printf("Первая популяция:\n");
+        fprintf(log_file,"Первая популяция:\n");
     }
     for (pi = 0; pi < p_size; pi++) {
         if (debug_mode == 1) {
             printf("№ %d gene: ", pi);
+            fprintf(log_file,"№ %d gene: ", pi);
         }
         for(i = 0; i < max_length; ++i) {
             if (debug_mode == 1) {
                 printf("%d", pop[pi].gene[i]);
+                fprintf(log_file,"%d", pop[pi].gene[i]);
             }
         }
         
         if (debug_mode == 1) {
             printf("; cost: %d", pop[pi].cost);
+            fprintf(log_file,"; cost: %d", pop[pi].cost);
             printf("\n");
+            fprintf(log_file,"\n");
         }
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");        
     }
   
     /* ========== ГЛАВНЫЙ ЦИКЛ ГЕНЕТИЧЕСКОГО АЛГОРИТМА ========== */
@@ -134,26 +148,31 @@ int main(int argc, char** argv) {
     /* В цикле размером макс.кол-во в поколении генерирую три случайных числа от 0 до макс.кол-во в поколении */
     if (debug_mode == 1) {
         printf("\nПоколение: %d. Турнирный отбор (из %d штук):\n", cnt_generations, p_tournament);
+        fprintf(log_file,"\nПоколение: %d. Турнирный отбор (из %d штук):\n", cnt_generations, p_tournament);
     }
     for (pi = 0; pi < p_size; pi++) {
         if (debug_mode == 1) {
             printf("\n%d-й обновленный индивид:\n", pi);
+            fprintf(log_file,"\n%d-й обновленный индивид:\n", pi);
         }
         int last_id, last_cost = -1;
         for (i = 0; i < p_tournament; i++) { // цикл из n раз
             if (debug_mode == 1) {
                 printf("\n%d-й шаг турнирного отбора:\n", i);
+                fprintf(log_file,"\n%d-й шаг турнирного отбора:\n", i);
             }
             // Генерация случайного числа от 0 до p_size - чтобы случайно выбрать одного из индивидов текущего поколения
             //p_rand = 0 + rand()%((p_size-1) - 0 + 1);    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
             p_rand = generate_random_number(0,(p_size-1));    // сгенерировать случайный индекс и по нему получить индивида из текущего пула
             if (debug_mode == 1) {
                 printf("p_rand: %d, cost: %d\n", p_rand, pop[p_rand].cost);
+                fprintf(log_file,"p_rand: %d, cost: %d\n", p_rand, pop[p_rand].cost);
             }
             // Выбираем лучшего из троих
             if (pop[p_rand].cost > last_cost) {
                 if (debug_mode == 1) {
                     printf("last_id_old: %d; curr_id: %d ",last_cost, pop[p_rand].cost);
+                    fprintf(log_file,"last_id_old: %d; curr_id: %d ",last_cost, pop[p_rand].cost);
                 }
                 last_id = p_rand;
                 last_cost = pop[p_rand].cost;
@@ -163,44 +182,54 @@ int main(int argc, char** argv) {
             new_pop[pi].gene[i] = pop[last_id].gene[i];
             if (debug_mode == 1) {
                 printf("%d",pop[last_id].gene[i]);
+                fprintf(log_file,"%d",pop[last_id].gene[i]);
             }
         } 
     if (debug_mode == 1) {
         printf("\nThe Best %d, cost: %d\n", last_id, last_cost);
+        fprintf(log_file,"\nThe Best %d, cost: %d\n", last_id, last_cost);
     }
     new_pop[pi].cost = last_cost;
     }
 
     if (debug_mode == 1) {
         printf("\nПоколение после турнирного отбора:\n");
+        fprintf(log_file,"\nПоколение после турнирного отбора:\n");
     }
     /* Выводим новых индивидов на экран */
     for (pi = 0; pi < p_size; pi++) {
         if (debug_mode == 1) {
             printf("№ %d gene: ", pi);
+            fprintf(log_file,"№ %d gene: ", pi);
         }
         for(i = 0; i < max_length; ++i) {
             if (debug_mode == 1) {
                 printf("%d", new_pop[pi].gene[i]);
+                fprintf(log_file,"%d", new_pop[pi].gene[i]);
             }
         }
         if (debug_mode == 1) {
             printf("; cost: %d", new_pop[pi].cost);
+            fprintf(log_file,"; cost: %d", new_pop[pi].cost);
             printf("\n");
+            fprintf(log_file,"\n");
         }
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");
     }
 
     /* ========== СКРЕЩИВАНИЕ ========== */
 
     if (debug_mode == 1) {
-        printf("Скрещивание с вероятностью 0.9:\n\n");
+        printf("Скрещивание с вероятностью:\n\n");
+        fprintf(log_file,"Скрещивание с вероятностью:\n\n");
     }
     for (pi = 0; pi < p_size; pi=pi+2) {
         if (debug_mode == 1) {
             printf("Пара номер: pi: %d\n", pi);
+            fprintf(log_file,"Пара номер: pi: %d\n", pi);
         }
         // Генерация случайного числа от 1 до 10
         //p_rand = 1 + rand()%(100 - 1 + 1);
@@ -208,6 +237,7 @@ int main(int argc, char** argv) {
         // Если сработала вероятность 0.9 - произвести скрещивание
         if (debug_mode == 1) {
             printf("p_rand: %d ", p_rand);
+            fprintf(log_file,"p_rand: %d ", p_rand);
         }        
 
         /* Генерация случайного числа в промежутке ОТ и ДО */
@@ -221,6 +251,10 @@ int main(int argc, char** argv) {
             printf("left: %d\n", s_left);
             printf("right: %d", max_length - s_left - 1);
             printf("\n");
+
+            fprintf(log_file,"left: %d\n", s_left);
+            fprintf(log_file,"right: %d", max_length - s_left - 1);
+            fprintf(log_file,"\n");
         }
 
         /* Одноточечное случайное скрещивание */
@@ -228,94 +262,117 @@ int main(int argc, char** argv) {
         /* Сначала дублируем всё что слева от точки скрещивания */
         if (debug_mode == 1) {
             printf("(s_left-1): %d\n",s_left-1);
+            fprintf(log_file,"(s_left-1): %d\n",s_left-1);            
         }
         for (cInd = 0; cInd < 2; cInd++) {
             if (p_rand <= P_CROSSOVER) {
                 if (debug_mode == 1) {
-                    printf("Сработала вероятность 0.9 - производится одноточечное скрещивание\n");
+                    printf("Сработала вероятность %d - производится одноточечное скрещивание\n",P_CROSSOVER);
                     printf("%d. Первая часть: ", pi+cInd);
+                    fprintf(log_file,"Сработала вероятность %d - производится одноточечное скрещивание\n",P_CROSSOVER);
+                    fprintf(log_file,"%d. Первая часть: ", pi+cInd);
                 }
                 for(i=0; i < s_left; i++) {
                     the2pop[pi+cInd].gene[i] = new_pop[pi+cInd].gene[i];
                     if (debug_mode == 1) {
                         printf("%d",the2pop[pi+cInd].gene[i]);
+                        fprintf(log_file,"%d",the2pop[pi+cInd].gene[i]);                        
                     }
                 }
                 if (debug_mode == 1) {
                     printf("\n");
+                    fprintf(log_file,"\n");
                 }
                 /* Обрабатываем вторые куски - то, что справа меняем местами между парами */
                 /* Очередная пара - один и два*/
                 if (debug_mode == 1) {
                     printf("%d. Вторая часть, первый: ", pi);
+                    fprintf(log_file,"%d. Вторая часть, первый: ", pi);
                 }
                 for(i=s_left; i < max_length; i++) {
                     the2pop[pi].gene[i] = new_pop[pi+1].gene[i];
                     if (debug_mode == 1) {
                         printf("%d",the2pop[pi].gene[i]);
+                        fprintf(log_file,"%d",the2pop[pi].gene[i]);
                     }
                 }
                 if (debug_mode == 1) {
-                    printf("\n");
+                    printf("\n");                    
                     printf("%d. Вторая часть, второй: ", pi);
+                    fprintf(log_file,"\n");
+                    fprintf(log_file,"%d. Вторая часть, второй: ", pi);
                 }
                 for(i=s_left; i < max_length; i++) {                    
                     the2pop[pi+1].gene[i] = new_pop[pi].gene[i];
                     if (debug_mode == 1) {
                         printf("%d",the2pop[pi+1].gene[i]);
+                        fprintf(log_file,"%d",the2pop[pi+1].gene[i]);
                     }
                 }
                 if (debug_mode == 1) {
                     printf("\n");
+                    fprintf(log_file,"\n");
                 }
             }
             else {
                 if (debug_mode == 1) {
                     printf("\nБез скрещивания:\n");
                     printf("%d. Первая часть: ", pi+cInd);
+                    fprintf(log_file,"\nБез скрещивания:\n");
+                    fprintf(log_file,"%d. Первая часть: ", pi+cInd);
                 }
                 for(i=0; i < max_length; i++) {
                     the2pop[pi+cInd].gene[i] = pop[pi+cInd].gene[i];
                     if (debug_mode == 1) {
                         printf("%d",the2pop[pi+cInd].gene[i]);
+                        fprintf(log_file,"%d",the2pop[pi+cInd].gene[i]);
                     }
                 }
                 if (debug_mode == 1) {
                     printf("\n");
+                    fprintf(log_file,"\n");
                 }
             }
         }
         if (debug_mode == 1) {
             printf("\n");
+            fprintf(log_file,"\n");
         }
                 
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");
     }
     
     /* Выводим всех сгенерированных индивидов на экран */
     if (debug_mode == 1) {
         printf("Популяция после скрещивания:\n");
+        fprintf(log_file,"Популяция после скрещивания:\n");
     }
     for (pi = 0; pi < p_size; pi++) {
         the2pop[pi].cost = 0;
         if (debug_mode == 1) {
             printf("№ %d gene: ", pi);
+            fprintf(log_file,"№ %d gene: ", pi);
         }
         for(i = 0; i < max_length; ++i) {
             if (debug_mode == 1) {
                 printf("%d", the2pop[pi].gene[i]);
+                fprintf(log_file,"%d", the2pop[pi].gene[i]);
             }
             the2pop[pi].cost = the2pop[pi].cost + the2pop[pi].gene[i];
         }
         if (debug_mode == 1) {
             printf("; cost: %d", the2pop[pi].cost);
             printf("\n");
+            fprintf(log_file,"; cost: %d", the2pop[pi].cost);
+            fprintf(log_file,"\n");
         }
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");
     }
 
     /* ========== МУТАЦИЯ ========== */
@@ -326,6 +383,7 @@ int main(int argc, char** argv) {
         p_rand = generate_random_number(1,100);
         if (debug_mode == 1) {
             printf("%d: Вероятность мутации: %d\n", pi, p_rand);
+            fprintf(log_file,"%d: Вероятность мутации: %d\n", pi, p_rand);
         }
         // Если сработала вероятность 10% - произвести мутацию в случайном гене
         
@@ -335,6 +393,7 @@ int main(int argc, char** argv) {
             p_mut = generate_random_number(0, max_length-1);
             if (debug_mode == 1) {
                 printf("Ген: %d\n", p_mut);
+                fprintf(log_file,"Ген: %d\n", p_mut);
             }
             gene = the2pop[pi].gene[p_mut];
             if (gene == 0)
@@ -346,6 +405,7 @@ int main(int argc, char** argv) {
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");
     }
     
     /* Выводим всех сгенерированных индивидов на экран */
@@ -353,15 +413,18 @@ int main(int argc, char** argv) {
     math_max_val = -1;
     if (debug_mode == 1) {
         printf("Популяция после мутации:\n");
+        fprintf(log_file,"Популяция после мутации:\n");
     }
     for (pi = 0; pi < p_size; pi++) {
         the2pop[pi].cost = 0;
         if (debug_mode == 1) {
             printf("№ %d gene: ", pi);
+            fprintf(log_file,"№ %d gene: ", pi);
         }
         for(i = 0; i < max_length; ++i) {
             if (debug_mode == 1) {
                 printf("%d", the2pop[pi].gene[i]);
+                fprintf(log_file,"%d", the2pop[pi].gene[i]);
             }
             the2pop[pi].cost = the2pop[pi].cost + the2pop[pi].gene[i];
             math_all_gene = math_all_gene + the2pop[pi].gene[i];
@@ -369,6 +432,8 @@ int main(int argc, char** argv) {
         if (debug_mode == 1) {
             printf("; cost: %d", the2pop[pi].cost);
             printf("\n");
+            fprintf(log_file,"; cost: %d", the2pop[pi].cost);
+            fprintf(log_file,"\n");
         }
         /* Получение максимальной стоимости */
             if (the2pop[pi].cost > math_max_val){
@@ -385,18 +450,24 @@ int main(int argc, char** argv) {
     if (debug_mode == 1) {
         printf("\nsum_genes: %.1f\n", (float)math_all_gene/p_size);
         printf("max_cost: %d\n", math_max_val);
-        printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);        
+        printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
+        fprintf(log_file,"\nsum_genes: %.1f\n", (float)math_all_gene/p_size);
+        fprintf(log_file,"max_cost: %d\n", math_max_val);
+        fprintf(log_file,"generations: %d, sum_genes: %.1f, max_cost: %d\n", cnt_generations, itog[cnt_generations].avg, itog[cnt_generations].max);
     }
 
     /* Копирование текущей популяции в структуру первой популяции и повторение цикла */
     if (debug_mode == 1) {
         printf("\nКопирование текущей популяции в структуру первой популяции и повторение цикла\n");
+        fprintf(log_file,"\nКопирование текущей популяции в структуру первой популяции и повторение цикла\n");
     }
     int r_ind = 0;
     for (pi = 0; pi < p_size; pi++) {   /* Счётчик индивидов */
         for(i=0; i < max_length; i++) { /* Счётчик генов у конкретного индивида */
             pop[pi].gene[i] = the2pop[pi].gene[i];
-            //printf("%d", pop[pi].gene[i]);
+            
+            printf("\npi: %d, i: %d, gene: %d", pi, i, the2pop[pi].gene[i]);
+            fprintf(log_file,"\npi: %d, i: %d, gene: %d", pi, i, the2pop[pi].gene[i]);
         }
         pop[pi].cost = the2pop[pi].cost;
     if (debug_mode == 1) {
@@ -406,13 +477,19 @@ int main(int argc, char** argv) {
     }
     if (debug_mode == 1) {
         printf("\n");
+        fprintf(log_file,"\n");
         // Вывод на экран
         for (pi = 0; pi < p_size; pi++) {
             printf("gene: ");
+            fprintf(log_file,"gene: ");
             for(i = 0; i < max_length; ++i) {
-                printf("%d", pop[pi].gene[i]);}
-                printf("; cost: %d", pop[pi].cost);
-               printf("\n");
+                printf("%d", pop[pi].gene[i]);
+                fprintf(log_file,"%d", pop[pi].gene[i]);
+            }
+        printf("; cost: %d", pop[pi].cost);
+        printf("\n");
+        fprintf(log_file,"; cost: %d", pop[pi].cost);
+        fprintf(log_file,"\n");
             }
         }
         //printf("cnt_generations: %d; currMax: %d\n",cnt_generations,currMax);
@@ -423,23 +500,26 @@ int main(int argc, char** argv) {
     printf("\n");
     i = 1;
     currMax = 0;
+    fprintf(log_file,"\n");
     for (i=1; i < MAX_GENERATIONS; i++) {
         if (debug_mode == 1) {
             printf("generations: %d, sum_genes: %.1f, max_cost: %d\n", i, itog[i].avg, itog[i].max);
         }
         printf("%d; %.1f; %d\n", i, itog[i].avg, itog[i].max);
         fprintf(file,"%d %.1f %d\n", i, itog[i].avg, itog[i].max);
+        fprintf(log_file,"%d %.1f %d\n", i, itog[i].avg, itog[i].max);
         if (itog[i].max == max_length) {
             break;
         }
     }
     fclose(file);
+    fclose(log_file);
     // Окончание записи данных в файл
 
     // Запуск команды gnuplot для рисования графика
     pid_t pid=fork();
     if (pid==0) {
-        static char *argv[]={"gnuplot","ga_graph.gpi",NULL};
+        static char *argv[]={"gnuplot","GA_graph.gpi",NULL};
         execv("/bin/gnuplot",argv);
         exit(127);
     }
