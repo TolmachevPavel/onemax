@@ -9,7 +9,7 @@ OneMax - это задача с битовой строкой, цель кото
 Решаю с помощью генетического алгоритма используя турнирный отбор, одноточечное скрещивание и мутацию.
 
 ### Пример итогового графика с решением зачачи OneMax
-![](https://github.com/TolmachevPavel/onemax/blob/main/GA_onemax_readme.jpeg)
+![](https://github.com/TolmachevPavel/onemax/blob/main/for_readme.jpeg)
 
 ### Как запускать программу
 
