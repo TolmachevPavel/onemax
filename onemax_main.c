@@ -18,12 +18,12 @@
 int main(int argc, char** argv) {
 /* Отбор, но чуть попозже */
 
-    int MAX_GENERATIONS = 10;   // Количество поколений
-    int p_size = 10;    /* Размер популяции */
-    int max_length = 5;    /* Размер хромосомы */
+    int MAX_GENERATIONS = 100;   // Количество поколений
+    int p_size = 100;    /* Размер популяции */
+    int max_length = 100;    /* Размер хромосомы */
     int p_tournament = 3;  /* Индивидов в турнирном отборе */
     int P_CROSSOVER = 90;   /* Вероятность скрещивания */
-    int P_MUTATION = 0;    /* Вероятность мутации */
+    int P_MUTATION = 5;    /* Вероятность мутации */
 
     int n_from, n_max;  /* Левая и правая границы селекции */
     int i = 0;
